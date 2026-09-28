@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizer Portal - EventEase</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">
+                🎓 Event<span>Ease</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}">Explore Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Registrations</a></li>
+                <li><a th:href="@{/organizer/events}" class="active">Organizer Portal</a></li>
+                <li><a th:href="@{/events/create}" class="btn btn-sm btn-primary">+ Create Event</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Operation completed successfully!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}">An error occurred.</span>
+        </div>
+
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <div>
+                <h2>🏢 Organizer Dashboard</h2>
+                <p style="color: var(--text-muted); margin-top: 0.25rem;">Manage the events hosted by your department/club and monitor participant lists.</p>
+            </div>
+            <a th:href="@{/events/create}" class="btn btn-success">+ Create New Event</a>
+        </div>
+
+        <!-- Organizer Selector Bar -->
+        <div class="card" style="padding: 1rem 1.5rem; margin-bottom: 1.5rem;" th:if="${organizers != null and !#lists.isEmpty(organizers)}">
+            <form th:action="@{/organizer/events}" method="get" class="form-row" style="align-items: center; margin-bottom: 0;">
+                <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                    <label for="organizerId" style="font-size: 0.85rem;">Filter by Organizer / Department:</label>
+                    <select id="organizerId" name="organizerId" class="form-control" onchange="this.form.submit()">
+                        <option value="">-- All Organizers (Show All Events) --</option>
+                        <option th:each="org : ${organizers}" 
+                                th:value="${org.id}" 
+                                th:text="${org.name + (org.email != null ? ' (' + org.email + ')' : '')}"
+                                th:selected="${selectedOrganizerId != null && selectedOrganizerId == org.id}">
+                            Computer Engineering Club
+                        </option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Organizer Header if specific organizer is active -->
+        <div th:if="${currentOrganizer != null}" class="card" style="background: #eff6ff; border-left: 4px solid var(--primary-color); margin-bottom: 1.5rem;">
+            <h3 th:text="${'Managing Events for: ' + currentOrganizer.name}">Managing Events for: Computer Engineering Club</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" th:if="${currentOrganizer.email != null}" th:text="${'Contact: ' + currentOrganizer.email}">Contact: organizer@college.edu</p>
+        </div>
+
+        <!-- Events Managed Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>Max Seats</th>
+                        <th>Available Seats</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${events == null or #lists.isEmpty(events)}">
+                        <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No events found for this organizer. <a th:href="@{/events/create}">Create your first event now!</a>
+                        </td>
+                    </tr>
+                    <tr th:each="event : ${events}">
+                        <td>
+                            <strong th:text="${event.title}">Web Development Bootcamp</strong>
+                        </td>
+                        <td>
+                            <span class="badge badge-category" th:text="${event.category}">Workshop</span>
+                        </td>
+                        <td th:text="${event.eventDate}">
+                            2026-10-25
+                        </td>
+                        <td th:text="${event.venue}">Lab 302</td>
+                        <td th:text="${event.maxSeats}">60</td>
+                        <td>
+                            <span th:if="${event.availableSeats != null and event.availableSeats > 0}" class="badge badge-available" th:text="${event.availableSeats + ' Available'}">
+                                25 Available
+                            </span>
+                            <span th:if="${event.availableSeats != null and event.availableSeats <= 0}" class="badge badge-full">
+                                Fully Booked
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="btn-group" style="justify-content: center;">
+                                <!-- View Participants -->
+                                <a th:href="@{'/events/' + ${event.id} + '/registrations'}" class="btn btn-sm btn-primary">
+                                    👥 Participants
+                                </a>
+
+                                <!-- Edit Event -->
+                                <a th:href="@{'/events/edit/' + ${event.id}}" class="btn btn-sm btn-secondary">
+                                    ✏️ Edit
+                                </a>
+
+                                <!-- Delete Event Form -->
+                                <form th:action="@{'/events/delete/' + ${event.id}}" 
+                                      method="post" 
+                                      onsubmit="return confirm('Are you sure you want to delete this event? All associated registrations will also be removed.');" 
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger">🗑️ Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 <strong>EventEase</strong> - College Event Registration System.</p>
+        <p>Built with Spring Boot, Thymeleaf, and Pure CSS for College Viva & Demonstrations.</p>
+    </footer>
+
+</body>
+</html>

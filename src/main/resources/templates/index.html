@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventEase - College Event Registration System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">
+                🎓 Event<span>Ease</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}" class="active">Home</a></li>
+                <li><a th:href="@{/events}">Explore Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Registrations</a></li>
+                <li><a th:href="@{/organizer/events}">Organizer Portal</a></li>
+                <li><a th:href="@{/events/create}" class="btn btn-sm btn-primary">+ Create Event</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Hero Section -->
+        <div class="hero-banner">
+            <h1>EventEase - College Event Registration System</h1>
+            <p>Your one-stop campus hub to discover exciting workshops, cultural fests, technical hackathons, and sports events. Register instantly and track your participations seamlessly!</p>
+        </div>
+
+        <!-- Quick Stats Cards -->
+        <div class="grid-2" style="margin-bottom: 2rem;">
+            <div class="stat-card">
+                <div class="stat-label">Total Events Available</div>
+                <div class="stat-number" th:text="${totalEvents != null ? totalEvents : '0'}">12</div>
+                <p class="text-muted" style="color: var(--text-muted); font-size: 0.85rem;">Across Technical, Cultural, Sports & Workshops</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Registered Students</div>
+                <div class="stat-number" th:text="${totalStudents != null ? totalStudents : '0'}">450</div>
+                <p class="text-muted" style="color: var(--text-muted); font-size: 0.85rem;">Active campus participants</p>
+            </div>
+        </div>
+
+        <!-- Quick Navigation Cards -->
+        <h2 style="margin-bottom: 1rem; font-size: 1.4rem;">Explore & Manage</h2>
+        <div class="grid-4">
+            <!-- View Events -->
+            <div class="action-card">
+                <div>
+                    <h3>🎪 View Events</h3>
+                    <p>Browse all upcoming campus events, check seat availability in real time, and register.</p>
+                </div>
+                <a th:href="@{/events}" class="btn btn-primary btn-block">Explore Events</a>
+            </div>
+
+            <!-- My Registrations -->
+            <div class="action-card">
+                <div>
+                    <h3>📋 My Registrations</h3>
+                    <p>Check the events you have registered for, view registration dates, or manage your bookings.</p>
+                </div>
+                <a th:href="@{/my-registrations}" class="btn btn-secondary btn-block">View Registrations</a>
+            </div>
+
+            <!-- Organizer Portal -->
+            <div class="action-card">
+                <div>
+                    <h3>🏢 Organizer Portal</h3>
+                    <p>Event organizers can view managed events, monitor participant lists, and update details.</p>
+                </div>
+                <a th:href="@{/organizer/events}" class="btn btn-secondary btn-block">Organizer Dashboard</a>
+            </div>
+
+            <!-- Create Event -->
+            <div class="action-card">
+                <div>
+                    <h3>➕ Create Event</h3>
+                    <p>Host a new technical seminar, cultural competition, sports tournament, or club workshop.</p>
+                </div>
+                <a th:href="@{/events/create}" class="btn btn-success btn-block">Create New Event</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 <strong>EventEase</strong> - College Event Registration System.</p>
+        <p>Built with Spring Boot, Thymeleaf, and Pure CSS for College Viva & Demonstrations.</p>
+    </footer>
+
+</body>
+</html>

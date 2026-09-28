@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Details - EventEase</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">
+                🎓 Event<span>Ease</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">Explore Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Registrations</a></li>
+                <li><a th:href="@{/organizer/events}">Organizer Portal</a></li>
+                <li><a th:href="@{/events/create}" class="btn btn-sm btn-primary">+ Create Event</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container" style="max-width: 900px;">
+
+        <!-- Back Link -->
+        <div style="margin-bottom: 1rem;">
+            <a th:href="@{/events}" class="btn btn-outline btn-sm">&larr; Back to All Events</a>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Operation completed successfully!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}">An error occurred while processing your request.</span>
+        </div>
+
+        <!-- Event Details Card -->
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <span class="badge badge-category" th:text="${event.category}" style="margin-bottom: 0.5rem;">Technical</span>
+                    <h2 th:text="${event.title}" style="font-size: 1.75rem; margin-top: 0.25rem;">Annual Hackathon 2026</h2>
+                </div>
+                <div>
+                    <span th:if="${availableSeats != null and availableSeats > 0}" class="badge badge-available" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;" th:text="${availableSeats + ' Seats Available'}">
+                        30 Seats Available
+                    </span>
+                    <span th:if="${availableSeats != null and availableSeats <= 0}" class="badge badge-full" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">
+                        Registration Closed – Event is Full
+                    </span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin: 1.5rem 0;">
+                <h4 style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; margin-bottom: 0.5rem;">About This Event</h4>
+                <p style="font-size: 1.05rem; line-height: 1.7; color: var(--text-main); white-space: pre-line;" th:text="${event.description}">
+                    Join us for an exciting campus event. Mentors, meals, and certificates provided for all registered participants.
+                </p>
+            </div>
+
+            <!-- Key Info Grid -->
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">📅 Event Date</div>
+                    <div class="detail-value" th:text="${event.eventDate}">
+                        2026-10-25
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">📍 Venue</div>
+                    <div class="detail-value" th:text="${event.venue}">Main Auditorium Hall</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">👥 Total Capacity</div>
+                    <div class="detail-value" th:text="${event.maxSeats + ' Students'}">100 Students</div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">🎟️ Available Seats</div>
+                    <div class="detail-value" th:text="${availableSeats}">45</div>
+                </div>
+            </div>
+
+            <!-- Organizer Info Box -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1.25rem; margin-top: 1.5rem;">
+                <h4 style="margin-bottom: 0.5rem; font-size: 0.95rem; color: var(--text-muted); text-transform: uppercase;">Hosted By</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <div>
+                        <strong style="font-size: 1.1rem; color: var(--text-main);" th:text="${event.organizer != null ? event.organizer.name : 'College Department'}">Computer Engineering Department</strong>
+                        <div style="color: var(--text-muted); font-size: 0.9rem;" th:if="${event.organizer != null and event.organizer.email != null}">
+                            ✉️ <span th:text="${event.organizer.email}">organizer@college.edu</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Area -->
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                <a th:if="${availableSeats != null and availableSeats > 0}" 
+                   th:href="@{'/register/' + ${event.id}}" 
+                   class="btn btn-success" 
+                   style="font-size: 1.05rem; padding: 0.75rem 1.75rem;">
+                    Register Now &rarr;
+                </a>
+                
+                <span th:if="${availableSeats != null and availableSeats <= 0}" 
+                      class="badge badge-full" 
+                      style="font-size: 1rem; padding: 0.75rem 1.25rem;">
+                    Registration Closed – Event is Full
+                </span>
+
+                <a th:href="@{/events}" class="btn btn-outline" style="padding: 0.75rem 1.25rem;">Browse Other Events</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 <strong>EventEase</strong> - College Event Registration System.</p>
+        <p>Built with Spring Boot, Thymeleaf, and Pure CSS for College Viva & Demonstrations.</p>
+    </footer>
+
+</body>
+</html>

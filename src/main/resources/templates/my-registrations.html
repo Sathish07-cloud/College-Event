@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Registrations - EventEase</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">
+                🎓 Event<span>Ease</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}">Explore Events</a></li>
+                <li><a th:href="@{/my-registrations}" class="active">My Registrations</a></li>
+                <li><a th:href="@{/organizer/events}">Organizer Portal</a></li>
+                <li><a th:href="@{/events/create}" class="btn btn-sm btn-primary">+ Create Event</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Registration updated successfully!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}">Student record not found or an error occurred.</span>
+        </div>
+
+        <!-- Student Lookup Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🔎 Student Registrations Lookup</h2>
+            </div>
+            <form th:action="@{/my-registrations}" method="get">
+                <div class="form-row" style="align-items: flex-end;">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label for="studentId">Student ID:</label>
+                        <input type="number" 
+                               id="studentId" 
+                               name="studentId" 
+                               th:value="${studentId}" 
+                               class="form-control" 
+                               placeholder="Enter numeric Student ID (e.g. 1, 2, 3...)" 
+                               required>
+                    </div>
+                    
+                    <div class="form-group" style="flex: 2; margin-bottom: 0;" th:if="${students != null and !#lists.isEmpty(students)}">
+                        <label for="studentSelect">Or Choose Student from List:</label>
+                        <select id="studentSelect" class="form-control" onchange="if(this.value) { document.getElementById('studentId').value = this.value; this.form.submit(); }">
+                            <option value="">-- Choose student --</option>
+                            <option th:each="st : ${students}" 
+                                    th:value="${st.id}" 
+                                    th:selected="${student != null && student.id == st.id}"
+                                    th:text="${'ID: ' + st.id + ' - ' + st.name + ' (' + st.department + ', Year ' + st.yearOfStudy + ')'}">
+                                ID: 1 - Arun Kumar
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="flex: 0 0 auto; margin-bottom: 0;">
+                        <button type="submit" class="btn btn-primary">Find Registrations</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Student Details Box (if student found) -->
+        <div th:if="${student != null}" class="card" style="background: #f8fafc; border-left: 4px solid var(--primary-color);">
+            <div class="card-header">
+                <h3>🎓 Student Profile Information</h3>
+            </div>
+            <div class="grid-4">
+                <div>
+                    <div class="detail-label">Student ID</div>
+                    <div class="detail-value" th:text="${student.id}">1</div>
+                </div>
+                <div>
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value" th:text="${student.name}">Arun Kumar</div>
+                </div>
+                <div>
+                    <div class="detail-label">Department</div>
+                    <div class="detail-value" th:text="${student.department}">Computer Science</div>
+                </div>
+                <div>
+                    <div class="detail-label">Academic Year</div>
+                    <div class="detail-value" th:text="${'Year ' + student.yearOfStudy}">Year 3</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registrations Table -->
+        <div th:if="${registrations != null}">
+            <div class="card-header" style="margin-top: 1.5rem;">
+                <h3>📑 Registered Events List</h3>
+                <span class="badge badge-registered" th:text="${registrations.size() + ' Bookings'}">3 Bookings</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Event Title</th>
+                            <th>Event Category</th>
+                            <th>Event Date</th>
+                            <th>Venue</th>
+                            <th>Registration Date</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(registrations)}">
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                No event registrations found for this student. <a th:href="@{/events}">Browse events to register!</a>
+                            </td>
+                        </tr>
+                        <tr th:each="reg : ${registrations}">
+                            <td>
+                                <strong th:text="${reg.event != null ? reg.event.title : 'Event'}">Java Workshop</strong>
+                            </td>
+                            <td>
+                                <span class="badge badge-category" th:text="${reg.event != null ? reg.event.category : 'Technical'}">Technical</span>
+                            </td>
+                            <td th:text="${reg.event != null ? reg.event.eventDate : '-'}">
+                                2026-10-25
+                            </td>
+                            <td th:text="${reg.event != null ? reg.event.venue : '-'}">Lab 3</td>
+                            <td th:text="${reg.registrationDate}">
+                                2026-10-20
+                            </td>
+                            <td>
+                                <span th:if="${reg.status == 'REGISTERED'}" class="badge badge-registered">
+                                    REGISTERED
+                                </span>
+                                <span th:if="${reg.status == 'CANCELLED'}" class="badge badge-cancelled">
+                                    CANCELLED
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <!-- Cancel Registration Form -->
+                                <form th:if="${reg.status == 'REGISTERED'}" 
+                                      th:action="@{'/registration/' + ${reg.id} + '/cancel'}" 
+                                      method="post" 
+                                      onsubmit="return confirm('Are you sure you want to cancel this event registration? Your seat will be freed up.');"
+                                      style="display: inline;">
+                                    <input type="hidden" name="studentId" th:value="${student.id}">
+                                    <button type="submit" class="btn btn-sm btn-danger">Cancel Registration</button>
+                                </form>
+
+                                <span th:if="${reg.status == 'CANCELLED'}" class="badge badge-cancelled">
+                                    Cancelled
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 <strong>EventEase</strong> - College Event Registration System.</p>
+        <p>Built with Spring Boot, Thymeleaf, and Pure CSS for College Viva & Demonstrations.</p>
+    </footer>
+
+</body>
+</html>

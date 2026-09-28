@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Events - EventEase</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a th:href="@{/}" class="navbar-brand">
+                🎓 Event<span>Ease</span>
+            </a>
+            <ul class="navbar-nav">
+                <li><a th:href="@{/}">Home</a></li>
+                <li><a th:href="@{/events}" class="active">Explore Events</a></li>
+                <li><a th:href="@{/my-registrations}">My Registrations</a></li>
+                <li><a th:href="@{/organizer/events}">Organizer Portal</a></li>
+                <li><a th:href="@{/events/create}" class="btn btn-sm btn-primary">+ Create Event</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+
+        <!-- Flash Messages / Alert Banners -->
+        <div th:if="${successMessage}" class="alert alert-success">
+            <span th:text="${successMessage}">Operation completed successfully!</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <span th:text="${errorMessage}">An error occurred while processing your request.</span>
+        </div>
+
+        <div class="card-header" style="margin-bottom: 1.5rem;">
+            <div>
+                <h2>📅 College Campus Events</h2>
+                <p style="color: var(--text-muted); margin-top: 0.25rem;">Explore upcoming events and reserve your seats early.</p>
+            </div>
+            <a th:href="@{/events/create}" class="btn btn-success">+ Host New Event</a>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="filter-bar">
+            <!-- Keyword Search Form -->
+            <form th:action="@{/events}" method="get" class="search-input-group">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="🔍 Search event title..." class="form-control">
+                <input type="hidden" name="category" th:value="${selectedCategory}" th:if="${selectedCategory != null and !selectedCategory.isEmpty()}">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a th:href="@{/events}" class="btn btn-outline" th:if="${keyword != null and !keyword.isEmpty()}">Clear</a>
+            </form>
+
+            <!-- Category Filter Chips -->
+            <div class="category-filter-group">
+                <span style="font-weight: 600; font-size: 0.85rem; color: var(--text-muted); margin-right: 0.25rem;">Category:</span>
+                <a th:href="@{/events(keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == null or selectedCategory.isEmpty() or selectedCategory == 'ALL'} ? 'active' : ''" 
+                   class="filter-chip">All</a>
+                <a th:href="@{/events(category='Technical', keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == 'Technical'} ? 'active' : ''" 
+                   class="filter-chip">Technical</a>
+                <a th:href="@{/events(category='Cultural', keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == 'Cultural'} ? 'active' : ''" 
+                   class="filter-chip">Cultural</a>
+                <a th:href="@{/events(category='Sports', keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == 'Sports'} ? 'active' : ''" 
+                   class="filter-chip">Sports</a>
+                <a th:href="@{/events(category='Workshop', keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == 'Workshop'} ? 'active' : ''" 
+                   class="filter-chip">Workshop</a>
+                <a th:href="@{/events(category='Seminar', keyword=${keyword})}" 
+                   th:classappend="${selectedCategory == 'Seminar'} ? 'active' : ''" 
+                   class="filter-chip">Seminar</a>
+            </div>
+        </div>
+
+        <!-- Events Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>Capacity</th>
+                        <th>Available Seats</th>
+                        <th>Organizer</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${events == null or #lists.isEmpty(events)}">
+                        <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                            No events found matching your criteria. Try adjusting search filters or host a new event!
+                        </td>
+                    </tr>
+                    <tr th:each="event : ${events}">
+                        <td>
+                            <strong th:text="${event.title}">AI & Web Dev Workshop</strong>
+                        </td>
+                        <td>
+                            <span class="badge badge-category" th:text="${event.category}">Technical</span>
+                        </td>
+                        <td th:text="${event.eventDate}">
+                            2026-10-25
+                        </td>
+                        <td th:text="${event.venue}">Auditorium Hall A</td>
+                        <td th:text="${event.maxSeats}">100</td>
+                        <td>
+                            <span th:if="${event.availableSeats != null and event.availableSeats > 0}" class="badge badge-available" th:text="${event.availableSeats + ' Seats Left'}">
+                                45 Seats Left
+                            </span>
+                            <span th:if="${event.availableSeats != null and event.availableSeats <= 0}" class="badge badge-full">
+                                Registration Closed – Full
+                            </span>
+                        </td>
+                        <td th:text="${event.organizer != null ? event.organizer.name : 'College Department'}">Computer Society</td>
+                        <td style="text-align: center;">
+                            <div class="btn-group" style="justify-content: center;">
+                                <a th:href="@{'/events/' + ${event.id}}" class="btn btn-sm btn-outline">View Details</a>
+                                
+                                <a th:if="${event.availableSeats != null and event.availableSeats > 0}" 
+                                   th:href="@{'/register/' + ${event.id}}" 
+                                   class="btn btn-sm btn-success">Register</a>
+                                   
+                                <span th:if="${event.availableSeats != null and event.availableSeats <= 0}" 
+                                      class="badge badge-full" 
+                                      style="padding: 0.4rem 0.6rem;">Registration Closed</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2026 <strong>EventEase</strong> - College Event Registration System.</p>
+        <p>Built with Spring Boot, Thymeleaf, and Pure CSS for College Viva & Demonstrations.</p>
+    </footer>
+
+</body>
+</html>
